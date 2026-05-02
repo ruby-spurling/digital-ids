@@ -1,5 +1,7 @@
 package com.settp.id.core.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.settp.id.core.exception.AttributeDoesNotExistException;
 
 import java.time.LocalDateTime;
@@ -8,17 +10,22 @@ import java.util.Map;
 
 public class DigitalID {
     private final String uuid;
-    private final LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
     private IdentityStatus status;
-    private final Map<String, String> attributes;
+    @JsonProperty("attributes")
+    private Map<String, String> attributes;
 
-    public DigitalID(String uuid) {
+    @JsonCreator
+    public DigitalID(@JsonProperty("uuid") String uuid) {
         this.uuid = uuid;
         this.createdAt = LocalDateTime.now();
         this.status = IdentityStatus.ACTIVE;
         this.attributes = new HashMap<>();
     }
+
+    // No argument version of constructor required by Jackson for JSON deserialisation, private to force use of regular constructor
+    // private DigitalID(){}
 
     public String getUuid() {
         return uuid;
