@@ -24,9 +24,6 @@ public class DigitalID {
         this.attributes = new HashMap<>();
     }
 
-    // No argument version of constructor required by Jackson for JSON deserialisation, private to force use of regular constructor
-    // private DigitalID(){}
-
     public String getUuid() {
         return uuid;
     }
