@@ -2,8 +2,10 @@ package com.settp.id.core.service;
 
 import com.settp.id.core.exception.IdentityNotFoundException;
 import com.settp.id.core.exception.IllegalStatusChangeException;
+import com.settp.id.core.exception.UnauthorisedAccessException;
 import com.settp.id.core.model.DigitalID;
 import com.settp.id.core.model.IdentityStatus;
+import com.settp.id.core.model.Organisation;
 import com.settp.id.core.repository.IdentityRepository;
 
 import java.util.UUID;
@@ -15,7 +17,12 @@ public class CentralAuthority {
         this.repository = repository;
     }
 
-    public String createIdentity() {
+    public String createIdentity(Organisation requester) {
+        if (requester != Organisation.CENTRAL_AUTHORITY) {
+            SecurityLogger.logUnauthorisedAttempt("NULL", requester.name(), "attempted to create new ID");
+            throw new UnauthorisedAccessException(requester.name(), "ID creation");
+        }
+
         String uuid = UUID.randomUUID().toString();
         DigitalID newIdentity = new DigitalID(uuid);
 
@@ -24,7 +31,12 @@ public class CentralAuthority {
         return uuid;
     }
 
-    public void statusUpdate(String uuid, IdentityStatus newStatus) {
+    public void statusUpdate(String uuid, IdentityStatus newStatus, Organisation requester) {
+        if (requester != Organisation.CENTRAL_AUTHORITY) {
+            SecurityLogger.logUnauthorisedAttempt(uuid, requester.name(), "attempted to change ID status");
+            throw new UnauthorisedAccessException(requester.name(), "status update");
+        }
+
         DigitalID identity = repository.findByUuid(uuid).orElseThrow(() -> new IdentityNotFoundException(uuid));
 
         if (identity.getStatus() == IdentityStatus.REVOKED) {
@@ -37,7 +49,12 @@ public class CentralAuthority {
         SecurityLogger.logStatusUpdate(uuid, newStatus);
     }
 
-    public void updateAttribute(String uuid, String key, String value) {
+    public void updateAttribute(String uuid, String key, String value, Organisation requester) {
+        if (requester != Organisation.CENTRAL_AUTHORITY) {
+            SecurityLogger.logUnauthorisedAttempt(uuid, requester.name(), "attempted to update ID attributes");
+            throw new UnauthorisedAccessException(requester.name(), "attribute update");
+        }
+
         DigitalID identity = repository.findByUuid(uuid).orElseThrow(() -> new IdentityNotFoundException(uuid));
 
         if (identity.getStatus() == IdentityStatus.REVOKED) {
