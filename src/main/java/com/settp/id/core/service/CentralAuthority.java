@@ -20,6 +20,7 @@ public class CentralAuthority {
         DigitalID newIdentity = new DigitalID(uuid);
 
         repository.save(newIdentity);
+        SecurityLogger.logCreation(uuid);
         return uuid;
     }
 
@@ -27,21 +28,25 @@ public class CentralAuthority {
         DigitalID identity = repository.findByUuid(uuid).orElseThrow(() -> new IdentityNotFoundException(uuid));
 
         if (identity.getStatus() == IdentityStatus.REVOKED) {
+            SecurityLogger.logUnauthorisedAttempt(uuid, "Central Authority", "update the status of a REVOKED ID");
             throw new IllegalStatusChangeException(identity.getStatus(), "Status Update");
         }
 
         identity.setStatus(newStatus);
         repository.save(identity);
+        SecurityLogger.logStatusUpdate(uuid, newStatus);
     }
 
     public void updateAttribute(String uuid, String key, String value) {
         DigitalID identity = repository.findByUuid(uuid).orElseThrow(() -> new IdentityNotFoundException(uuid));
 
         if (identity.getStatus() == IdentityStatus.REVOKED) {
+            SecurityLogger.logUnauthorisedAttempt(uuid, "Central Authority", "update the attributes of a REVOKED ID");
             throw new IllegalStatusChangeException(identity.getStatus(), "Attribute Update");
         }
 
         identity.setAttribute(key, value);
         repository.save(identity);
+        SecurityLogger.logAttributeUpdate(uuid, key, value);
     }
 }
