@@ -40,7 +40,7 @@ public class DigitalID {
         if (attributes.containsKey(key)) {
             return attributes.get(key);
         } else {
-            throw new AttributeDoesNotExistException(key);
+            return this.attributes.get(key);
         }
     }
 
