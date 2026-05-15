@@ -1,8 +1,6 @@
 package com.settp.id.cli;
 
-import com.settp.id.core.exception.DataAccessException;
-import com.settp.id.core.exception.IdentityNotFoundException;
-import com.settp.id.core.exception.IllegalStatusChangeException;
+import com.settp.id.core.exception.*;
 import com.settp.id.core.model.IdentityStatus;
 import com.settp.id.core.model.Organisation;
 import com.settp.id.core.service.CentralAuthority;
@@ -37,7 +35,7 @@ public class ConsoleApplication {
 
             try {
                 running = handleChoice(choice);
-            } catch (IdentityNotFoundException | IllegalStatusChangeException e) {
+            } catch (IdentityNotFoundException | IllegalStatusChangeException | ImmutableChangeException e) {
                 System.out.println("\n[REJECTED] " + e.getMessage());
             }  catch (DataAccessException e) {
                 System.out.println("\n[ERROR] Database failure: " + e.getMessage());

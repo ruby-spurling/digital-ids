@@ -2,16 +2,24 @@ package com.settp.id.core.service;
 
 import com.settp.id.core.exception.IdentityNotFoundException;
 import com.settp.id.core.exception.IllegalStatusChangeException;
+import com.settp.id.core.exception.ImmutableChangeException;
 import com.settp.id.core.exception.UnauthorisedAccessException;
 import com.settp.id.core.model.DigitalID;
 import com.settp.id.core.model.IdentityStatus;
 import com.settp.id.core.model.Organisation;
 import com.settp.id.core.repository.IdentityRepository;
 
+import java.util.Set;
 import java.util.UUID;
 
 public class CentralAuthority {
     private final IdentityRepository repository;
+
+    private static final Set<String> immutable_attributes = Set.of(
+            "name",
+            "date_of_birth",
+            "ni_number"
+    );
 
     public CentralAuthority(IdentityRepository repository) {
         this.repository = repository;
@@ -60,6 +68,14 @@ public class CentralAuthority {
         if (identity.getStatus() == IdentityStatus.REVOKED) {
             SecurityLogger.logUnauthorisedAttempt(uuid, "Central Authority", "update the attributes of a REVOKED ID");
             throw new IllegalStatusChangeException(identity.getStatus(), "Attribute Update");
+        }
+
+        if (immutable_attributes.contains(key.toLowerCase())) {
+            String existingValue = identity.getAttribute(key);
+            if (existingValue != null && !existingValue.equals(value)) {
+                SecurityLogger.logUnauthorisedAttempt(uuid, requester.name(), "Attempted to change the immutable attribute: " + key);
+                throw new ImmutableChangeException(key);
+            }
         }
 
         identity.setAttribute(key, value);
