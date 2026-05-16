@@ -53,6 +53,7 @@ public class ConsoleApplication {
         System.out.println("2. Employer (Verification)");
         System.out.println("3. Tax Service (Verification)");
         System.out.println("4. Driving License Authority (Verification)");
+        System.out.println("5. Bank (Verification)");
 
         while (userRole == null) {
             String choice = scanner.nextLine();
@@ -69,6 +70,9 @@ public class ConsoleApplication {
                     break;
                 case "4":
                     userRole = Organisation.DRIVING_LICENSE_AUTHORITY;
+                    break;
+                case "5":
+                    userRole = Organisation.BANK;
                     break;
                 default:
                     System.out.println("[ERROR] Invalid user choice");

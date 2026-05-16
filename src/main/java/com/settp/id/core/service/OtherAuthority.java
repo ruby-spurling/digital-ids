@@ -54,6 +54,12 @@ public class OtherAuthority {
                 }
                 break;
 
+            case BANK:
+                boolean isValid = identity.getStatus() == IdentityStatus.ACTIVE;
+                permittedData.put("ID valid? ", String.valueOf(isValid));
+                break;
+
+
             case CENTRAL_AUTHORITY:
                 permittedData.put("SYSTEM MESSAGE", "Use central authority service for management");
                 break;
