@@ -75,7 +75,7 @@ public class ConsoleApplication {
                     userRole = Organisation.BANK;
                     break;
                 default:
-                    System.out.println("[ERROR] Invalid user choice");
+                    System.out.println("[ERROR] Invalid user choice, enter a number from 1-5");
             }
         }
         System.out.println("[SUCCESS] Logged in as " + userRole.name());
@@ -91,8 +91,9 @@ public class ConsoleApplication {
             System.out.println("4. View ID data");
             System.out.println("5. Exit");
         } else {
-            System.out.println("1. View ID data");
-            System.out.println("2. Exit");
+            System.out.println("1. View all ID data");
+            System.out.println("2. Check if status is valid");
+            System.out.println("3. Exit");
         }
             System.out.println("Select an option: ");
     }
@@ -136,7 +137,7 @@ public class ConsoleApplication {
             case "5":
                 return false;
             default:
-                System.out.println("[ERROR] Invalid option, enter a number from 1-4");
+                System.out.println("[ERROR] Invalid option, enter a number from 1-5");
                 return true;
         }
     }
@@ -147,9 +148,12 @@ public class ConsoleApplication {
                 viewIdentity();
                 return true;
             case "2":
+                doQuickCheck();
+                return true;
+            case "3":
                 return false;
             default:
-                System.out.println("[ERROR] Invalid option, enter a number from 1-2");
+                System.out.println("[ERROR] Invalid option, enter a number from 1-3");
                 return true;
         }
     }
@@ -162,6 +166,16 @@ public class ConsoleApplication {
 
         System.out.println("\n--- ID Record ---");
         uuidData.forEach((key, value) -> System.out.println("- " + key + ": " + value));
+        System.out.println("-----------------------");
+    }
+
+    private void doQuickCheck() {
+        System.out.println("Enter UUID to check status of: ");
+        String uuid = scanner.nextLine();
+
+        boolean isValid = verificationService.statusValidityCheck(uuid);
+        System.out.println("\n--- Status Check ---");
+        System.out.println("Is the ID ACTIVE? " + (isValid ? "YES" : "NO"));
         System.out.println("-----------------------");
     }
 }

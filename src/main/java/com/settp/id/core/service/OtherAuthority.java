@@ -59,13 +59,26 @@ public class OtherAuthority {
                 permittedData.put("ID valid? ", String.valueOf(isValid));
                 break;
 
-
             case CENTRAL_AUTHORITY:
                 permittedData.put("SYSTEM MESSAGE", "Use central authority service for management");
                 break;
         }
         return permittedData;
     }
+
+    public boolean statusValidityCheck(String uuid) {
+        DigitalID id = repository.findByUuid(uuid).orElseThrow(() -> new IdentityNotFoundException(uuid));
+        if (id.getStatus() == IdentityStatus.ACTIVE) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // private boolean attributeCheck(String uuid) {
+        // DigitalID id = repository.findByUuid(uuid).orElseThrow(() -> new IdentityNotFoundException(uuid));
+
+    // }
 
     private void safeFetch(Map<String, String> permittedData, DigitalID identity, String key) {
         String value = identity.getAttribute(key);
