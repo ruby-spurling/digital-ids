@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.Year;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class OtherAuthority {
     private final IdentityRepository repository;
@@ -68,25 +69,12 @@ public class OtherAuthority {
 
     public boolean statusValidityCheck(String uuid) {
         DigitalID id = repository.findByUuid(uuid).orElseThrow(() -> new IdentityNotFoundException(uuid));
-        if (id.getStatus() == IdentityStatus.ACTIVE) {
-            return true;
-        } else {
-            return false;
-        }
+        return id.getStatus() == IdentityStatus.ACTIVE;
     }
-
-    // private boolean attributeCheck(String uuid) {
-        // DigitalID id = repository.findByUuid(uuid).orElseThrow(() -> new IdentityNotFoundException(uuid));
-
-    // }
 
     private void safeFetch(Map<String, String> permittedData, DigitalID identity, String key) {
         String value = identity.getAttribute(key);
-        if (value != null) {
-            permittedData.put(key, value);
-        } else {
-            permittedData.put(key, "Not set");
-        }
+        permittedData.put(key, Objects.requireNonNullElse(value, "Not set"));
     }
 
     private void checkTaxReportingPeriod(Map<String, String> data, DigitalID identity, Year currentYear) {

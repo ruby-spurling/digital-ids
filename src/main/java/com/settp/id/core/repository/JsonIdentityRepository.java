@@ -29,7 +29,8 @@ public class JsonIdentityRepository implements IdentityRepository{
 
         if (!file.exists() || file.length() == 0) return;
 
-        try { storage = objectMapper.readValue(file, new TypeReference<Map<String, DigitalID>>() {});}
+        try { storage = objectMapper.readValue(file, new TypeReference<>() {
+        });}
         catch (IOException e) {throw new DataLoadException(filePath, e);}
     }
 

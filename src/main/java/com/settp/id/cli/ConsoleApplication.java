@@ -82,7 +82,7 @@ public class ConsoleApplication {
     }
 
     private void printMenu() {
-        System.out.println(String.format("\n %s Menu", userRole.name()));
+        System.out.printf("\n %s Menu%n", userRole.name());
 
         if (userRole == Organisation.CENTRAL_AUTHORITY) {
             System.out.println("1. Create new ID");
