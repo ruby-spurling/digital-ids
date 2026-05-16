@@ -9,6 +9,7 @@ import com.settp.id.core.model.IdentityStatus;
 import com.settp.id.core.model.Organisation;
 import com.settp.id.core.repository.IdentityRepository;
 
+import java.time.LocalDate;
 import java.util.Set;
 import java.util.UUID;
 
@@ -53,6 +54,7 @@ public class CentralAuthority {
         }
 
         identity.setStatus(newStatus);
+        identity.setStatusChangedAt(LocalDate.now());
         repository.save(identity);
         SecurityLogger.logStatusUpdate(uuid, newStatus);
     }

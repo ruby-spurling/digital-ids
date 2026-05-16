@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.settp.id.core.exception.AttributeDoesNotExistException;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +16,7 @@ public class DigitalID {
     private IdentityStatus status;
     @JsonProperty("attributes")
     private Map<String, String> attributes;
+    private LocalDate statusChangedAt;
 
     @JsonCreator
     public DigitalID(@JsonProperty("uuid") String uuid) {
@@ -44,12 +46,18 @@ public class DigitalID {
         }
     }
 
+    public LocalDate getStatusChangedAt() {return statusChangedAt; }
+
     public void setStatus(IdentityStatus status) {
         this.status = status;
     }
 
     public void setAttribute(String key, String value) {
         this.attributes.put(key, value);
+    }
+
+    public void setStatusChangedAt(LocalDate date) {
+        this.statusChangedAt = date;
     }
 }
 
