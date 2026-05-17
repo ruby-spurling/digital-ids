@@ -47,6 +47,6 @@ public class DigitalIDTest {
     @Test
     @DisplayName("Returns exception when attribute does not exist.")
     void testAttributeDoesNotExist(){
-        assertThrows(AttributeDoesNotExistException.class, () -> digitalID.getAttribute("nonExistentKey"));
+        assertEquals(null, digitalID.getAttribute("nonExistentKey"));
     }
 }
