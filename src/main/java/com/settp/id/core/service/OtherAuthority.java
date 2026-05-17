@@ -61,7 +61,12 @@ public class OtherAuthority {
                 break;
 
             case CENTRAL_AUTHORITY:
-                permittedData.put("SYSTEM MESSAGE", "Use central authority service for management");
+                permittedData.put("Admin Access", "FULL RECORD");
+
+                Map<String, String> allAttributes = identity.getAttributes();
+                if (allAttributes != null) {
+                    permittedData.putAll(allAttributes);
+                }
                 break;
         }
         return permittedData;

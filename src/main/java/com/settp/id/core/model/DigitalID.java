@@ -39,6 +39,8 @@ public class DigitalID {
 
     public String getAttribute(String key) { return this.attributes.get(key); }
 
+    public Map<String, String> getAttributes() { return this.attributes; }
+
     public LocalDate getStatusChangedAt() {return statusChangedAt; }
 
     public void setStatus(IdentityStatus status) { this.status = status; }
