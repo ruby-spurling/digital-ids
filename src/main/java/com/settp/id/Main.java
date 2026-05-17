@@ -1,5 +1,6 @@
-package com.settp.id.cli;
+package com.settp.id;
 
+import com.settp.id.cli.ConsoleApplication;
 import com.settp.id.core.repository.IdentityRepository;
 import com.settp.id.core.repository.JsonIdentityRepository;
 import com.settp.id.core.service.CentralAuthority;

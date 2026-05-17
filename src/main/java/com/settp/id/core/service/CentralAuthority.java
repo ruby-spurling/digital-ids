@@ -10,17 +10,10 @@ import com.settp.id.core.model.Organisation;
 import com.settp.id.core.repository.IdentityRepository;
 
 import java.time.LocalDate;
-import java.util.Set;
 import java.util.UUID;
 
 public class CentralAuthority {
     private final IdentityRepository repository;
-
-    private static final Set<String> immutable_attributes = Set.of(
-            "name",
-            "date_of_birth",
-            "ni_number"
-    );
 
     public CentralAuthority(IdentityRepository repository) {
         this.repository = repository;

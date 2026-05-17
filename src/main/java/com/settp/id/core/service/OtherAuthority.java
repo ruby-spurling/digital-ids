@@ -35,7 +35,7 @@ public class OtherAuthority {
                     LocalDate dob = LocalDate.parse(dobStr);
                     LocalDate today = LocalDate.now();
                     int age = Period.between(dob, today).getYears();
-                    permittedData.put("over_18", (age >= 18) ? "true" : "false");
+                    permittedData.put("over_18", Boolean.toString(age >= 18));
                 } catch (Exception e) {
                     permittedData.put("over_18", "Unknown DOB format.");
                 }
@@ -97,7 +97,7 @@ public class OtherAuthority {
         if ((status == IdentityStatus.SUSPENDED) | status == IdentityStatus.REVOKED) {
             LocalDate changeDate = identity.getStatusChangedAt();
             if (changeDate != null && changeDate.getYear() == currentYear.getValue()) {
-                data.put("Tax Compliance", "WARNING: ID was " + status + "on" + changeDate + ". Audit required for " + currentYear);
+                data.put("Tax Compliance", "WARNING: ID was " + status + " on " + changeDate + ". Audit required for " + currentYear);
             } else {
                 data.put("Tax Compliance", "WARNING: ID was " + status + ". Audit required for " + currentYear);
             }
