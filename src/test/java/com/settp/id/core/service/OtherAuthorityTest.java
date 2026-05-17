@@ -53,12 +53,12 @@ public class OtherAuthorityTest {
     @Test
     @DisplayName("Authorities should safely fetch attributes even when they have no value")
     void testAttributeFetch() {
-        id.setAttribute("right_to_work", "Verified");
+        id.setAttribute("residency_status", "Verified");
 
-        Map<String, String> result = otherAuthority.verifyIdentity(uuid, Organisation.EMPLOYER);
+        Map<String, String> result = otherAuthority.verifyIdentity(uuid, Organisation.TAX_SERVICE);
 
-        assertEquals("Verified", result.get("right_to_work"));
-        assertEquals("Not set", result.get("over_18"));
+        assertEquals("Verified", result.get("residency_status"));
+        assertEquals("Not set", result.get("ni_number"));
     }
 
     @Test
