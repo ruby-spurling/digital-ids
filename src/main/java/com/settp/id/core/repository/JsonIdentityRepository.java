@@ -29,8 +29,7 @@ public class JsonIdentityRepository implements IdentityRepository{
 
         if (!file.exists() || file.length() == 0) return;
 
-        try { storage = objectMapper.readValue(file, new TypeReference<>() {
-        });}
+        try { storage = objectMapper.readValue(file, new TypeReference<>() {}); }
         catch (IOException e) {throw new DataLoadException(filePath, e);}
     }
 
@@ -46,9 +45,7 @@ public class JsonIdentityRepository implements IdentityRepository{
     }
 
     @Override
-    public Optional<DigitalID> findByUuid(String uuid) {
-        return Optional.ofNullable(storage.get(uuid));
-    }
+    public Optional<DigitalID> findByUuid(String uuid) { return Optional.ofNullable(storage.get(uuid)); }
 
     @Override
     public boolean exists(String uuid) {

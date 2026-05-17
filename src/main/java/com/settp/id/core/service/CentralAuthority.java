@@ -68,20 +68,17 @@ public class CentralAuthority {
         DigitalID identity = repository.findByUuid(uuid).orElseThrow(() -> new IdentityNotFoundException(uuid));
 
         if (identity.getStatus() == IdentityStatus.REVOKED) {
-            SecurityLogger.logUnauthorisedAttempt(uuid, "Central Authority", "update the attributes of a REVOKED ID");
+            SecurityLogger.logUnauthorisedAttempt(uuid, requester.name(), "update the attributes of a REVOKED ID");
             throw new IllegalStatusChangeException(identity.getStatus(), "Attribute Update");
         }
 
-        if (immutable_attributes.contains(key.toLowerCase())) {
-            String existingValue = identity.getAttribute(key);
-            if (existingValue != null && !existingValue.equals(value)) {
-                SecurityLogger.logUnauthorisedAttempt(uuid, requester.name(), "Attempted to change the immutable attribute: " + key);
-                throw new ImmutableChangeException(key);
-            }
+        try {
+            identity.setAttribute(key, value);
+            repository.save(identity);
+            SecurityLogger.logAttributeUpdate(uuid, key, value);
+        } catch (ImmutableChangeException | IllegalStatusChangeException e) {
+            SecurityLogger.logUnauthorisedAttempt(uuid, requester.name(), "Violated state rules" + e.getMessage());
+            throw e;
         }
-
-        identity.setAttribute(key, value);
-        repository.save(identity);
-        SecurityLogger.logAttributeUpdate(uuid, key, value);
     }
 }
