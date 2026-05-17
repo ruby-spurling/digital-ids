@@ -23,46 +23,24 @@ public class CentralAuthorityUI {
 
     public void printMenu() {
         System.out.printf("\n %s Menu%n", userRole.name());
-
-        if (userRole == Organisation.CENTRAL_AUTHORITY) {
-            System.out.println("1. Create new ID");
-            System.out.println("2. Update status of an ID");
-            System.out.println("3. Update ID data");
-            System.out.println("4. View ID data");
-            System.out.println("5. Exit");
-        } else {
-            System.out.println("1. View all ID data");
-            System.out.println("2. Check if status is valid");
-            System.out.println("3. Exit");
-        }
+        System.out.println("1. Create new ID");
+        System.out.println("2. Update status of an ID");
+        System.out.println("3. Update ID data");
+        System.out.println("4. View ID data");
+        System.out.println("5. Exit");
         System.out.println("Select an option: ");
     }
 
     public boolean handleChoice(String choice) {
         switch (choice) {
             case "1":
-                String newUuid = managementService.createIdentity(userRole);
-                System.out.println("[Success] Created new identity with UUID: " + newUuid);
+                createIdentity();
                 return true;
             case "2":
-                System.out.println("Enter UUID: ");
-                String uuidToUpdate = scanner.nextLine();
-                System.out.println("Enter new Status (ACTIVE, SUSPENDED, REVOKED): ");
-                String statusStr = scanner.nextLine().toUpperCase();
-
-                managementService.statusUpdate(uuidToUpdate, IdentityStatus.valueOf(statusStr), userRole);
-                System.out.println("[SUCCESS] Status updated");
+                updateIdentityStatus();
                 return true;
             case "3":
-                System.out.println("Enter UUID: ");
-                String attrUuid = scanner.nextLine();
-                System.out.println("Enter attribute to update: ");
-                String attrName = scanner.nextLine();
-                System.out.println("Enter updated value: ");
-                String attrValue = scanner.nextLine();
-
-                managementService.updateAttribute(attrUuid, attrName, attrValue, userRole);
-                System.out.println("[SUCCESS] Attribute updated");
+                updateSingleAttribute();
                 return true;
             case "4":
                 viewIdentity();
@@ -72,6 +50,57 @@ public class CentralAuthorityUI {
             default:
                 System.out.println("[ERROR] Invalid option, enter a number from 1-5");
                 return true;
+        }
+    }
+
+    private void createIdentity() {
+        System.out.println("\n--- Creating new ID---");
+        String newUuid = managementService.createIdentity(userRole);
+
+        String name = "";
+        while (name.trim().isEmpty()) {
+            System.out.println("Enter full name: ");
+            name = scanner.nextLine();
+            if (name.trim().isEmpty()) {
+                System.out.println("[ERROR] Name is required, please enter a name");
+            }
+        }
+        managementService.updateAttribute(newUuid, "name", name, userRole);
+
+        String dob = "";
+        while (dob.trim().isEmpty()) {
+            System.out.println("Enter date of birth: ");
+            dob = scanner.nextLine();
+            if (dob.trim().isEmpty()) {
+                System.out.println("[ERROR] Date of birth is required, please enter a date");
+            }
+        }
+        managementService.updateAttribute(newUuid, "date_of_birth", dob, userRole);
+
+        getAdditionalDetails(newUuid);
+
+        System.out.println("-----------------------");
+        System.out.println("[Success] Created new identity with UUID: " + newUuid);
+    }
+
+    private void getAdditionalDetails(String uuid) {
+        String[] optionalAttributes = {
+                "right_to_work",
+                "over_18",
+                "residency_status",
+                "ni_number",
+                "driving_restriction",
+                "driving_license_category",
+                "driving_penalty_points"
+        };
+        System.out.println("You will be prompted to add details for additional fields, press enter to skip any field.");
+        for (String attribute : optionalAttributes) {
+            System.out.println("Enter " + attribute);
+            String value = scanner.nextLine().trim();
+            if (!value.isEmpty()) {
+                managementService.updateAttribute(uuid, attribute, value, userRole);
+                System.out.println("[SUCCESS] " + attribute + " updated");
+            }
         }
     }
 
@@ -85,5 +114,25 @@ public class CentralAuthorityUI {
         System.out.println("UUID: " + uuid);
         uuidData.forEach((key, value) -> System.out.println("- " + key + ": " + value));
         System.out.println("-----------------------");
+    }
+
+    private void updateIdentityStatus() {
+        System.out.println("Enter UUID: ");
+        String uuidToUpdate = scanner.nextLine();
+        System.out.println("Enter new Status (ACTIVE, SUSPENDED, REVOKED): ");
+        String statusStr = scanner.nextLine().toUpperCase();
+        managementService.statusUpdate(uuidToUpdate, IdentityStatus.valueOf(statusStr), userRole);
+        System.out.println("[SUCCESS] Status updated");
+    }
+
+    private void updateSingleAttribute() {
+        System.out.println("Enter UUID: ");
+        String uuid = scanner.nextLine();
+        System.out.print("Enter new attribute to update: ");
+        String key = scanner.nextLine();
+        System.out.print("Enter new value: ");
+        String value = scanner.nextLine();
+        managementService.updateAttribute(uuid, key, value, userRole);
+        System.out.println("[SUCCESS] Attribute updated successfully.");
     }
 }
