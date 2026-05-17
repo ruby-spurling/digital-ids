@@ -69,7 +69,7 @@ public class CentralAuthorityUI {
 
         String dob = "";
         while (dob.trim().isEmpty()) {
-            System.out.println("Enter date of birth: ");
+            System.out.println("Enter date of birth in the format YYYY-MM-DD: ");
             dob = scanner.nextLine();
             if (dob.trim().isEmpty()) {
                 System.out.println("[ERROR] Date of birth is required, please enter a date");
@@ -86,7 +86,6 @@ public class CentralAuthorityUI {
     private void getAdditionalDetails(String uuid) {
         String[] optionalAttributes = {
                 "right_to_work",
-                "over_18",
                 "residency_status",
                 "ni_number",
                 "driving_restriction",

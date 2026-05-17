@@ -7,6 +7,7 @@ import com.settp.id.core.model.Organisation;
 import com.settp.id.core.repository.IdentityRepository;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.Year;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +30,15 @@ public class OtherAuthority {
         switch (requester) {
             case EMPLOYER:
                 safeFetch(permittedData, identity, "right_to_work");
-                safeFetch(permittedData, identity, "over_18");
+                String dobStr = identity.getAttribute("date_of_birth");
+                try {
+                    LocalDate dob = LocalDate.parse(dobStr);
+                    LocalDate today = LocalDate.now();
+                    int age = Period.between(dob, today).getYears();
+                    permittedData.put("over_18", (age >= 18) ? "true" : "false");
+                } catch (Exception e) {
+                    permittedData.put("over_18", "Unknown DOB format.");
+                }
                 break;
 
             case TAX_SERVICE:
