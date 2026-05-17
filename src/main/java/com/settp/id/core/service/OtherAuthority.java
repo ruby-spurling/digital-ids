@@ -57,7 +57,7 @@ public class OtherAuthority {
 
             case BANK:
                 boolean isValid = identity.getStatus() == IdentityStatus.ACTIVE;
-                permittedData.put("ID valid? ", String.valueOf(isValid));
+                permittedData.put("ID valid?", String.valueOf(isValid));
                 break;
 
             case CENTRAL_AUTHORITY:
@@ -83,11 +83,14 @@ public class OtherAuthority {
     }
 
     private void checkTaxReportingPeriod(Map<String, String> data, DigitalID identity, Year currentYear) {
-        LocalDate changeDate = identity.getStatusChangedAt();
+        IdentityStatus status = identity.getStatus();
 
-        if ((identity.getStatus() == IdentityStatus.SUSPENDED) && changeDate != null) {
-            if (changeDate.getYear() == currentYear.getValue()) {
-                data.put("Tax Compliance", "WARNING: ID was suspended on " + changeDate + ". Audit required for " + currentYear);
+        if ((status == IdentityStatus.SUSPENDED) | status == IdentityStatus.REVOKED) {
+            LocalDate changeDate = identity.getStatusChangedAt();
+            if (changeDate != null && changeDate.getYear() == currentYear.getValue()) {
+                data.put("Tax Compliance", "WARNING: ID was " + status + "on" + changeDate + ". Audit required for " + currentYear);
+            } else {
+                data.put("Tax Compliance", "WARNING: ID was " + status + ". Audit required for " + currentYear);
             }
         } else {
             data.put("Tax Compliance", "No status conflicts found for " + currentYear);
