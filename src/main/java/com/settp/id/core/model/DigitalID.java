@@ -34,17 +34,11 @@ public class DigitalID {
             "ni_number"
     );
 
-    public String getUuid() {
-        return uuid;
-    }
+    public String getUuid() { return uuid; }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
 
-    public IdentityStatus getStatus() {
-        return status;
-    }
+    public IdentityStatus getStatus() { return status; }
 
     public String getAttribute(String key) { return this.attributes.get(key); }
 

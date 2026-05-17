@@ -51,9 +51,4 @@ public class JsonIdentityRepository implements IdentityRepository{
     public boolean exists(String uuid) {
         return storage.containsKey(uuid);
     }
-
-    @Override
-    public Iterable<DigitalID> findAll(){
-        return storage.values();
-    }
 }

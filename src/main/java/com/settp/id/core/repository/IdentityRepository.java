@@ -10,6 +10,4 @@ public interface IdentityRepository {
     Optional<DigitalID> findByUuid(String uuid);
 
     boolean exists (String uuid);
-
-    Iterable<DigitalID> findAll();
 }
