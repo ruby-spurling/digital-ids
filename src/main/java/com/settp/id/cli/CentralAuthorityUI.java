@@ -24,8 +24,6 @@ public class CentralAuthorityUI {
         this.userRole = userRole;
     }
 
-
-
     public void printMenu() {
         System.out.printf("\n %s Menu%n", userRole.name());
         System.out.println("1. Create new ID");
@@ -116,6 +114,16 @@ public class CentralAuthorityUI {
         String uuidToUpdate = scanner.nextLine();
         System.out.println("Enter new Status (ACTIVE, SUSPENDED, REVOKED): ");
         String statusStr = scanner.nextLine().toUpperCase();
+
+        while (true) {
+            String currentStatusStr = statusStr;
+            if (Arrays.stream(IdentityStatus.values()).anyMatch(s -> s.name().equals(currentStatusStr))) {
+                break;
+            }
+            System.out.println("[INVALID INPUT] Status entered does not exist");
+            System.out.println("Enter new Status (ACTIVE, SUSPENDED, REVOKED): ");
+            statusStr = scanner.nextLine().toUpperCase();
+        }
         managementService.statusUpdate(uuidToUpdate, IdentityStatus.valueOf(statusStr), userRole);
         System.out.println("[SUCCESS] Status updated");
     }
@@ -125,8 +133,8 @@ public class CentralAuthorityUI {
         String uuid = scanner.nextLine();
         System.out.print("Enter attribute to update: ");
         String key = scanner.nextLine();
-        while (!Arrays.stream(optionalAttributes).toList().contains(key)) {
-            System.out.println("[ERROR] Attribute does not exist, please enter on of the following: " + Arrays.toString(optionalAttributes));
+        while (!Arrays.stream(optionalAttributes).toList().contains(key.toLowerCase())) {
+            System.out.println("[INVALID INPUT] Attribute does not exist, please enter on of the following: " + Arrays.toString(optionalAttributes));
             System.out.print("Enter attribute to update: ");
             key = scanner.nextLine();
         }

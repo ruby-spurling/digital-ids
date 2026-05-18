@@ -41,17 +41,8 @@ public class CentralAuthority {
     }
 
     public void statusUpdate(String uuid, IdentityStatus newStatus, Organisation requester) {
-        if (requester != Organisation.CENTRAL_AUTHORITY) {
-            SecurityLogger.logUnauthorisedAttempt(uuid, requester.name(), "attempted to change ID status");
-            throw new UnauthorisedAccessException(requester.name(), "status update");
-        }
-
         DigitalID identity = repository.findByUuid(uuid).orElseThrow(() -> new IdentityNotFoundException(uuid));
-
-        if (identity.getStatus() == IdentityStatus.REVOKED) {
-            SecurityLogger.logUnauthorisedAttempt(uuid, "Central Authority", "update the status of a REVOKED ID");
-            throw new IllegalStatusChangeException(identity.getStatus(), "Status Update");
-        }
+        validateStatusUpdate(identity, requester, uuid);
 
         identity.setStatus(newStatus);
         identity.setStatusChangedAt(LocalDate.now());
@@ -59,28 +50,35 @@ public class CentralAuthority {
         SecurityLogger.logStatusUpdate(uuid, newStatus);
     }
 
-    public void updateAttribute(String uuid, String key, String value, Organisation requester) {
+    private void validateStatusUpdate(DigitalID identity, Organisation requester, String uuid) {
         if (requester != Organisation.CENTRAL_AUTHORITY) {
-            throw new UnauthorisedAccessException(requester.name(), "Attribute Update");
+            SecurityLogger.logUnauthorisedAttempt(uuid, requester.name(), "attempted to change ID status");
+            throw new UnauthorisedAccessException(requester.name(), "status update");
         }
-
-        DigitalID identity = repository.findByUuid(uuid).orElseThrow(() -> new IdentityNotFoundException(uuid));
 
         if (identity.getStatus() == IdentityStatus.REVOKED) {
-            throw new IllegalStatusChangeException(identity.getStatus(), "Attribute Update");
+            SecurityLogger.logUnauthorisedAttempt(uuid, requester.name(), "update the status of a REVOKED ID");
+            throw new IllegalStatusChangeException(identity.getStatus(), "Status Update");
         }
+    }
 
-        if (!Arrays.stream(optionalAttributes).toList().contains(key)) {
-            throw new AttributeDoesNotExistException(key);
-        }
+    public void updateAttribute(String uuid, String key, String value, Organisation requester) {
+        DigitalID identity = repository.findByUuid(uuid).orElseThrow(() -> new IdentityNotFoundException(uuid));
+        validateAttributeUpdate(requester, identity, key);
 
         try {
             identity.setAttribute(key, value);
             repository.save(identity);
             SecurityLogger.logAttributeUpdate(uuid, key);
-        } catch (ImmutableChangeException | IllegalStatusChangeException e) {
+        } catch (ImmutableChangeException | IllegalStatusChangeException | AttributeDoesNotExistException | UnauthorisedAccessException e) {
             SecurityLogger.logUnauthorisedAttempt(uuid, requester.name(), " violate state rules " + e.getMessage());
             throw e;
         }
+    }
+
+    private void validateAttributeUpdate(Organisation requester, DigitalID identity, String key) {
+        if (requester != Organisation.CENTRAL_AUTHORITY) throw new UnauthorisedAccessException(requester.name(), "Attribute Update");
+        if (!Arrays.stream(optionalAttributes).toList().contains(key.toLowerCase()) && !key.equals("name") && !key.equals("date_of_birth")) throw new AttributeDoesNotExistException(key);
+        if (identity.getStatus() == IdentityStatus.REVOKED) throw new IllegalStatusChangeException(identity.getStatus(), "Attribute Update");
     }
 }
