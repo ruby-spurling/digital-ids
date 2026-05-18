@@ -35,10 +35,10 @@ public class CentralAuthorityTest {
     @DisplayName("Successfully update attribute of an active id")
     void testActiveIdAttributes() {
         String uuid = service.createIdentity(Organisation.CENTRAL_AUTHORITY);
-        service.updateAttribute(uuid, "clearance", "Level 5", Organisation.CENTRAL_AUTHORITY);
+        service.updateAttribute(uuid, "driving_penalty_points", "5", Organisation.CENTRAL_AUTHORITY);
 
         var id = testRepo.findByUuid(uuid).get();
-        assertEquals("Level 5", id.getAttribute("clearance"));
+        assertEquals("5", id.getAttribute("driving_penalty_points"));
     }
 
     @Test
@@ -48,7 +48,7 @@ public class CentralAuthorityTest {
         service.statusUpdate(uuid, IdentityStatus.REVOKED, Organisation.CENTRAL_AUTHORITY);
 
         assertThrows(IllegalStatusChangeException.class, () -> {
-            service.updateAttribute(uuid, "clearance", "Level 5", Organisation.CENTRAL_AUTHORITY);
+            service.updateAttribute(uuid, "driving_penalty_points", "5", Organisation.CENTRAL_AUTHORITY);
         });
     }
 
