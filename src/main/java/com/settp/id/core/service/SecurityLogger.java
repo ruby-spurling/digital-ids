@@ -42,8 +42,8 @@ public class SecurityLogger {
         logger.info(String.format("STATUS UPDATED | UUID: %s | Status updated to %s", uuid, newStatus));
     }
 
-    public static void logAttributeUpdate(String uuid, String attributeKey, String attributeValue) {
-        logger.info(String.format("ATTRIBUTE UPDATED | UUID: %s | %s updated to %s", uuid, attributeKey, attributeValue));
+    public static void logAttributeUpdate(String uuid, String attributeKey) {
+        logger.info(String.format("ATTRIBUTE UPDATED | UUID: %s | %s updated", uuid, attributeKey));
     }
 
     public static void logAccess(String uuid, String organisation) {

@@ -5,8 +5,11 @@ import com.settp.id.core.model.Organisation;
 import com.settp.id.core.service.CentralAuthority;
 import com.settp.id.core.service.OtherAuthority;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Scanner;
+
+import static com.settp.id.core.service.CentralAuthority.optionalAttributes;
 
 public class CentralAuthorityUI {
     private final CentralAuthority managementService;
@@ -21,6 +24,8 @@ public class CentralAuthorityUI {
         this.userRole = userRole;
     }
 
+
+
     public void printMenu() {
         System.out.printf("\n %s Menu%n", userRole.name());
         System.out.println("1. Create new ID");
@@ -32,25 +37,24 @@ public class CentralAuthorityUI {
     }
 
     public boolean handleChoice(String choice) {
-        switch (choice) {
-            case "1":
+        return switch (choice) {
+            case "1" -> {
                 createIdentity();
-                return true;
-            case "2":
+                yield true; }
+            case "2" -> {
                 updateIdentityStatus();
-                return true;
-            case "3":
+                yield true; }
+            case "3" -> {
                 updateSingleAttribute();
-                return true;
-            case "4":
+                yield true; }
+            case "4" -> {
                 viewIdentity();
-                return true;
-            case "5":
-                return false;
-            default:
+                yield true; }
+            case "5" -> false;
+            default -> {
                 System.out.println("[ERROR] Invalid option, enter a number from 1-5");
-                return true;
-        }
+                yield true; }
+        };
     }
 
     private void createIdentity() {
@@ -84,14 +88,6 @@ public class CentralAuthorityUI {
     }
 
     private void getAdditionalDetails(String uuid) {
-        String[] optionalAttributes = {
-                "right_to_work",
-                "residency_status",
-                "ni_number",
-                "driving_restriction",
-                "driving_license_category",
-                "driving_penalty_points"
-        };
         System.out.println("You will be prompted to add details for additional fields, press enter to skip any field.");
         for (String attribute : optionalAttributes) {
             System.out.println("Enter " + attribute);
@@ -127,8 +123,13 @@ public class CentralAuthorityUI {
     private void updateSingleAttribute() {
         System.out.println("Enter UUID: ");
         String uuid = scanner.nextLine();
-        System.out.print("Enter new attribute to update: ");
+        System.out.print("Enter attribute to update: ");
         String key = scanner.nextLine();
+        while (!Arrays.stream(optionalAttributes).toList().contains(key)) {
+            System.out.println("[ERROR] Attribute does not exist, please enter on of the following: " + Arrays.toString(optionalAttributes));
+            System.out.print("Enter attribute to update: ");
+            key = scanner.nextLine();
+        }
         System.out.print("Enter new value: ");
         String value = scanner.nextLine();
         managementService.updateAttribute(uuid, key, value, userRole);

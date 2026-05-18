@@ -1,15 +1,13 @@
 package com.settp.id.core.service;
 
-import com.settp.id.core.exception.IdentityNotFoundException;
-import com.settp.id.core.exception.IllegalStatusChangeException;
-import com.settp.id.core.exception.ImmutableChangeException;
-import com.settp.id.core.exception.UnauthorisedAccessException;
+import com.settp.id.core.exception.*;
 import com.settp.id.core.model.DigitalID;
 import com.settp.id.core.model.IdentityStatus;
 import com.settp.id.core.model.Organisation;
 import com.settp.id.core.repository.IdentityRepository;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.UUID;
 
 public class CentralAuthority {
@@ -18,6 +16,15 @@ public class CentralAuthority {
     public CentralAuthority(IdentityRepository repository) {
         this.repository = repository;
     }
+
+    public static final String[] optionalAttributes = {
+            "right_to_work",
+            "residency_status",
+            "ni_number",
+            "driving_restriction",
+            "driving_license_category",
+            "driving_penalty_points"
+    };
 
     public String createIdentity(Organisation requester) {
         if (requester != Organisation.CENTRAL_AUTHORITY) {
@@ -54,23 +61,25 @@ public class CentralAuthority {
 
     public void updateAttribute(String uuid, String key, String value, Organisation requester) {
         if (requester != Organisation.CENTRAL_AUTHORITY) {
-            SecurityLogger.logUnauthorisedAttempt(uuid, requester.name(), "attempted to update ID attributes");
-            throw new UnauthorisedAccessException(requester.name(), "attribute update");
+            throw new UnauthorisedAccessException(requester.name(), "Attribute Update");
         }
 
         DigitalID identity = repository.findByUuid(uuid).orElseThrow(() -> new IdentityNotFoundException(uuid));
 
         if (identity.getStatus() == IdentityStatus.REVOKED) {
-            SecurityLogger.logUnauthorisedAttempt(uuid, requester.name(), "update the attributes of a REVOKED ID");
             throw new IllegalStatusChangeException(identity.getStatus(), "Attribute Update");
+        }
+
+        if (!Arrays.stream(optionalAttributes).toList().contains(key)) {
+            throw new AttributeDoesNotExistException(key);
         }
 
         try {
             identity.setAttribute(key, value);
             repository.save(identity);
-            SecurityLogger.logAttributeUpdate(uuid, key, value);
+            SecurityLogger.logAttributeUpdate(uuid, key);
         } catch (ImmutableChangeException | IllegalStatusChangeException e) {
-            SecurityLogger.logUnauthorisedAttempt(uuid, requester.name(), "Violated state rules" + e.getMessage());
+            SecurityLogger.logUnauthorisedAttempt(uuid, requester.name(), " violate state rules " + e.getMessage());
             throw e;
         }
     }
