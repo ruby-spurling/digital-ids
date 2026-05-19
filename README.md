@@ -3,7 +3,13 @@
 Repository link: https://github.com/ruby-spurling/digital-ids
 
 ## How to run
-
+ - Java Development Kit (JDK) 21
+ - Apache Maven 4.0.0
+```text
+mvn clean package
+mvn test <-- To run tests
+mvn exec:java -Dexec.mainClass="com.settp.id.Main" <-- To run Main class
+```
 ## System Structure and Main Components
 ### File Structure
 ```text
